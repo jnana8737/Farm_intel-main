@@ -1,71 +1,77 @@
-# Farm_intel
+# Farm Intel (AgroSmart AI)
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-F7931E?style=flat&logo=scikitlearn&logoColor=white)
-![REST API](https://img.shields.io/badge/REST-API-25D366?style=flat)
+An AI-powered crop recommendation and farm intelligence platform. The frontend lets users input location and soil parameters, and the backend serves ML-based crop predictions using historical and geospatial data.
 
-## What it does
+## Tech Stack
 
-An end-to-end precision-agriculture platform covering the full soil-to-sale pipeline — instead of a farmer needing five different tools for soil analysis, crop choice, fertilizer planning, disease detection, and price forecasting, this puts all five behind one decision engine.
+### Frontend
+- **Node.js** — JavaScript runtime (required to run npm/Vite tooling)
+- **React 18** — UI library
+- **TypeScript** — static typing
+- **Vite** — build tool & dev server
+- **Tailwind CSS** — utility-first styling
+- **shadcn/ui** + **Radix UI** — accessible component primitives
+- **React Router DOM** — client-side routing
+- **TanStack Query (React Query)** — server state/data fetching
+- **React Hook Form** + **Zod** — forms & schema validation
+- **Recharts** — data visualization/charts
+- **Supabase JS client** — auth/database integration
+- **Lucide React** — icon set
+- **Sonner** — toast notifications
 
-## Key features
+### Backend
+- **Python 3**
+- **FastAPI** — REST API framework
+- **Pydantic** — request/response validation
+- **scikit-learn** (via `joblib` / `rf_model.pkl`) — Random Forest crop prediction model
+- **pandas / numpy** — data processing
+- **Google Earth Engine (`ee`)** — satellite/geospatial data
+- **Geopy (Nominatim)** — geocoding (lat/lon <-> district)
+- **Requests** — HTTP calls to external APIs
 
-- **Land suitability assessment** — CNN + GIS analysis on field data
-- **Crop recommendation** — Random Forest / XGBoost on N/P/K/pH/OC/EC soil features + climate data
-- **Fertilizer prediction & crop rotation planning**
-- **Disease & pest detection** — CNN on field images
-- **Market price forecasting** — ARIMA / LSTM time-series models
-- **Weather Forecast API** — regression + time-series on historical climate data, fed live into crop recommendation and irrigation scheduling, **reducing simulated resource consumption by 22%**
-- **Decision Fusion Engine** — resolves trade-offs between profit maximization and sustainability targets across all module outputs
+### Database / Infra
+- **Supabase** — backend-as-a-service (auth, database)
 
-## Architecture
+### Tooling
+- **ESLint** — linting
+- **Vitest** + **Testing Library** — unit testing
+- **Playwright** — end-to-end testing
+- **Bun** / **npm** — package management (both lockfiles present)
+
+## Project Structure
 
 ```
-Data Acquisition
-(soil sensors, weather API, field images)
-            │
-            ▼
-     ML Intelligence Layer
-  ┌─────────┬─────────┬──────────┐
-  Crop Rec   Disease    Price
-  (RF/XGB)   Detection  Forecast
-             (CNN)      (ARIMA/LSTM)
-  └─────────┴─────────┴──────────┘
-            │
-            ▼
-     Decision Fusion Engine
-  (profit vs. sustainability trade-off resolution)
-            │
-            ▼
-        Mobile App
-   (farmer-facing, multilingual)
+Farm_intel-main/
+├── src/                  # React frontend source
+├── backend/              # FastAPI backend
+│   ├── main.py           # API entrypoint (/predict endpoint)
+│   ├── utils.py          # Data processing & prediction logic
+│   └── final_model/      # Trained ML model + encoders + lookup data
+├── supabase/             # Supabase project config
+├── public/               # Static assets
+└── ...config files       # Vite, Tailwind, ESLint, TS configs
 ```
 
-## Tech stack
+## Getting Started
 
-| Layer | Tools |
-|---|---|
-| ML | Scikit-learn, Random Forest, XGBoost, CNN, ARIMA, LSTM |
-| API | REST API (Weather Forecast service) |
-| Data | N/P/K/pH/OC/EC soil features, GIS, historical climate data |
-
-## Design decisions
-
-- **Decision Fusion Engine as a separate layer** rather than baking trade-offs into each model — keeps profit/sustainability weighting tunable without retraining individual models.
-- **Virtual sensing** where physical soil sensors aren't available — estimates key soil parameters from satellite/climate proxies, since this needed to work for farmers without sensor hardware.
-- **Cloud-native, scalable design** chosen over a single-farm desktop tool, since the eventual goal is multi-region deployment.
-
-## Setup
-
+### Frontend
+Requires **Node.js** (v18+ recommended) and npm installed.
 ```bash
-git clone https://github.com/jnana8737/Farm_intel-main.git
-cd Farm_intel-main
-pip install -r requirements.txt
-python app.py
+npm install
+npm run dev       # start dev server
+npm run build     # production build
+npm run test      # run unit tests
 ```
 
-## What I'd add next
+### Backend
+```bash
+cd backend
+pip install fastapi uvicorn pydantic pandas numpy joblib requests geopy earthengine-api
+uvicorn main:app --reload
+```
 
-- Swap the manual feature engineering for an automated feature pipeline
-- Add test coverage on the recommendation and forecasting modules
-- Containerize the full pipeline (currently runs as separate scripts)
+The API will serve a `/predict` endpoint that accepts district or lat/lon, season, mode, and soil NPK values, returning a crop recommendation.
+
+## Environment Variables
+
+Create a `.env` file (not committed to version control) with the required Supabase and any external API keys used by the app.
